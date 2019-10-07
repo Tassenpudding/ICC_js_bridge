@@ -5,8 +5,8 @@
  *      Author: marvin
  */
 
-#ifndef SRC_ICCLIB_H_
-#define SRC_ICCLIB_H_
+#ifndef _ICCLIB_H_
+#define _ICCLIB_H_
 
 #include <stdint.h>
 
@@ -22,12 +22,13 @@ public:
 	 * alternative overloaded function to also give a seed and dont use the embedded one in the PL
 	 */
 	virtual int generateAddress(uint32_t index, int security, char* address);
-	virtual int generateAddress_seed(char* seed_in, uint32_t index, int security, char* address);
+	virtual int generateAddress(char* seed_in, uint32_t index,
+			int security, char* address);
 	/*
 	 * doPow takes a transaction as tx_pow with 2673 Trytes as int8_tacters A-Z and 9
 	 * gives back a nonce in int8_tacter format with size 28
 	 */
-	virtual void doPow(char* tx_pow, char* nonce);
+	virtual void doPow(char* tx_pow, char* nonce, int mwm);
 
 	/*
 	 * CurlHash takes 2673 Trytes as int8_tacters A-Z and 9
@@ -41,12 +42,16 @@ public:
 	 */
 	virtual void keccak384(uint8_t* txdata, uint32_t* hash);
 
-	/*virtual void attachToTangle_lib(const int8_t* trunkTransaction,
-	 const int8_t* branchTransaction, int minWeightMagnitude, int8_t* trytes,
-	 int numTrytes);*/
-	virtual void test_all1();
+	/*
+	 * troika takes an array with size 243
+	 * gives back a hash with size 243
+	 * input and output are encoded as simple numbers not ascii characters
+	 * trits are 0,1,2
+	 */
+	virtual void troika(unsigned char* input, unsigned char* result);
 private:
-	bool validateTrytes(int8_t* trytes, int len, bool checkzero);
+protected:
+
 };
 
 #endif /* SRC_ICCLIB_H_ */
