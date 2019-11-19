@@ -10,20 +10,21 @@
 
 #include <stdint.h>
 
-class ICC_lib {
+class libicc {
 public:
-	ICC_lib();
+	libicc();
 	/* use virtual otherwise linker will try to perform static linkage */
-	virtual ~ICC_lib();
+	virtual ~libicc();
 
 	/*
 	 * Generates Adresses with selected index and security
 	 * Address is a int8_t array with size 81
-	 * alternative overloaded function to also give a seed and dont use the embedded one in the PL
+	 * function to give a seed and dont use the embedded one in the PL
+	 * to use the embedded one give a NULL pointer
 	 */
-	virtual int generateAddress(uint32_t index, int security, char* address);
-	virtual int generateAddress(char* seed_in, uint32_t index,
-			int security, char* address);
+	//virtual int generateAddress(uint32_t index, int security, char* address);
+	virtual int generateAddress(char* seed_in, uint32_t index, int security,
+			char* address);
 	/*
 	 * doPow takes a transaction as tx_pow with 2673 Trytes as int8_tacters A-Z and 9
 	 * gives back a nonce in int8_tacter format with size 28
@@ -53,5 +54,11 @@ private:
 protected:
 
 };
+
+void throw_exception(char const*, char const*, int);
+
+extern "C" libicc* create_libicc();
+
+extern "C" void destroy_libicc(libicc* object);
 
 #endif /* SRC_ICCLIB_H_ */

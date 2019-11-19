@@ -8,19 +8,21 @@
 
 using namespace std;
 
-ICC_lib* libHandle;
+libicc* libHandle;
 
 Napi::String doPow(const Napi::CallbackInfo& info)	{
 	Napi::Env env = info.Env();
-	if (info.Length() > 1 || !info[0].IsString() ) {
+	if (info.Length() != 2 || !info[0].IsString() || !info[1].IsNumber() ) {
 		Napi::TypeError::New(env, "String expected").ThrowAsJavaScriptException();
 	}
 	Napi::String n_api_trytes = info[0].As<Napi::String>();	
 	string trytes = n_api_trytes.Utf8Value();	
 	
+	Napi::Number mwm = info[1].As<Napi::Number>();
+	
 	char nonce[28];
 	nonce[27] = '\0';
-	libHandle->doPow((char*)trytes.c_str(), nonce);	
+	libHandle->doPow((char*)trytes.c_str(), nonce, mwm.Int32Value());	
 	string* ret = new string(nonce);
 	
 	Napi::String returnValue = Napi::String::New(env, *ret);	
@@ -38,7 +40,7 @@ Napi::String generateAddress(const Napi::CallbackInfo& info){ //string seed, int
 	Napi::Number security = info[2].As<Napi::Number>();
 	
 	char address[82];	
-	libHandle->generateAddress_seed((char*)seed.c_str(), index.Int32Value(), security.Int32Value(), address);
+	libHandle->generateAddress((char*)seed.c_str(), index.Int32Value(), security.Int32Value(), address);
 	address[81] = '\0';
 	string* ret = new string(address);
 	
@@ -51,20 +53,20 @@ Napi::String generateAddress(const Napi::CallbackInfo& info){ //string seed, int
 }*/
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
-	void *handle;
+	//void *handle;
 
-	handle = dlopen("/home/pi/lib/ICC_lib.so", RTLD_LAZY);
-	if (handle == NULL) {
-		printf("dlopen failed\r\n");
-	}
+	//handle = dlopen("/home/pi/lib/ICC_lib.so", RTLD_LAZY);
+	//if (handle == NULL) {
+	//	printf("dlopen failed\r\n");
+	//}
 
-	ICC_lib* (*create)();
-	void (*destroy)(ICC_lib*);
+	//ICC_lib* (*create)();
+	//void (*destroy)(ICC_lib*);
 
-	create = (ICC_lib* (*)())dlsym(handle, "create_object");
-	destroy	= (void (*)(ICC_lib*))dlsym(handle, "destroy_object");
+	//create = (ICC_lib* (*)())dlsym(handle, "create_object");
+	//destroy	= (void (*)(ICC_lib*))dlsym(handle, "destroy_object");
 
-	libHandle	= (ICC_lib*) create();
+	libHandle	= (libicc*) create_libicc();
 	
 	exports.Set("doPow", Napi::Function::New(env, doPow));
 	exports.Set("generateAddress", Napi::Function::New(env, generateAddress));
